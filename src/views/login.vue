@@ -1,991 +1,1491 @@
 <template>
-  <div id="login">
-    <!--<img :src="img" alt="">-->
-    <header>
-      <div class="headersize"><img src="../icon/pic_size.png" alt=""></div>
-    </header>
-    <div class="Leftlogin">
-      <div class="Leftloginone" ref="Leftloginone"></div>
-      <div class="Leftlogintwo" ref="Leftlogintwo"></div>
-      <div class="Leftloginthree"></div>
-    </div>
-    <div class="Contentlogin">
-      <div class="Contentlogintop">
-        <div id="allmap" ref="allmap"></div>
-        <!--<canvas id="canvas"></canvas>
-        <div id="time"></div>-->
-        <div class="Transformation"></div>
-        <div class="Deduction"></div>
+    <div style="width: 100%;height: 100%;">
+      <div class="Leftlogin">
+        <div class="Leftloginone">
+          <div class="bigdataspan">污染源企业</div>
+          <div class="Leftloginonetitle" ref="Leftloginone"></div>
+        </div>
+        <div class="Leftloginthree">
+         <!-- <div class="Leftthree">
+            <p><span style="background: #FFAC3F"></span> 信号趋势</p>
+            <p><span style="background: #52FFFF"></span> 逻辑回归趋势</p>
+          </div>-->
+          <div class="bigdataspan">噪声污染分布</div>
+          <div class="Leftloginthreetitle" ref="Leftloginthree"></div>
+        </div>
+        <div class="Leftlogintwo">
+          <div class="lefttwo">
+            <div><span style="background: #de3d06"></span> 三级噪音</div>
+            <div><span style="background: #45c83c"></span> 二级噪音</div>
+            <div><span style="background: #051b89;"></span> 一级噪音</div>
+          </div>
+          <div class="bigdataspan">污染企业分布</div>  <!--ref="Leftlogintwo"-->
+          <div class="Leftlogintwotitle"><img src="@/icon/pic_jinan3.gif" alt=""></div>
+        </div>
       </div>
-      <div class="Contentloginbottom" ref="Contentloginbottom"></div>
+      <div class="Contentlogin">
+        <div class="Contentlogintop">
+          <div class="sssb">
+            <div style="padding-top: 1%">
+              <p style="font-size:18px;color:#65C6E7">实时空气质量检测</p>
+              <p>AQI指数:</p>
+              <p>62.00</p>
+              <p>首要污染物:</p>
+              <p>PM2.5</p>
+              <p>浓度:</p>
+              <p>44.1微克/立方米</p>
+            </div>
 
+          </div>
+          <div class="spanjihe">
+            <p><span style="background: #1fa447"></span><span style="background: #b2de43"></span><span style="background: #e1a626"></span><span style="background: #f6461d"></span><span style="background: #b52c24"></span></p>
+            <p><span>0</span><span>50</span><span>100</span><span>150</span><span>200</span></p>
+          </div>
+        </div>
+        <div class="Contentloginbottom">
+          <div class="loginbottom">
+            <p style="color:#65C6E7;font-size: 14px;font-weight: 700;line-height: 34px">地下水质量检测平均值</p>
+          </div>
+          <div class="Contentloginbottomtitle" ref="Contentloginbottom"></div>
+          <div class="loginbottoms">
+            <div>
+              <div><span>14</span>&nbsp; <div style="float: right">需氧量(mg/l)</div></div>
+              <div><span>16</span>&nbsp; <div style="float: right">氨氮量(mg/l)</div></div>
+            </div>
+            <div>
+              <div><span>23</span>&nbsp; <div style="float: right">含磷量(mg/l)</div></div>
+              <div><span>13</span>&nbsp; <div style="float: right">含氮量(mg/l)</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="Rightlogin">
+        <div class="Rightloginone">
+          <div class="bigdataspans">垃圾处理区域月统计</div>
+          <div class="Rightloginonetitle" ref="Rightloginoe">
+
+          </div>
+        </div>
+        <div class="Rightlogintwo">
+          <div class="bigdataspans">各地区抽样土壤检测平均值</div>
+          <div class="Rightlogintwotitle" ref="Rightlogintwo"></div>
+        </div>
+        <div class="Rightloginthree">
+          <div class="bigdataspans">污水检测实时报警</div>
+          <div class="Rightloginthreetitle" ref="Rightloginthree"></div>
+        </div>
+      </div>
     </div>
-    <div class="Rightlogin">
-      <div class="Rightloginone"  ref="Rightloginoe"></div>
-      <div class="Rightlogintwo" ref="Rightlogintwo"></div>
-      <div class="Rightloginthree" ref="Rightloginthree"></div>
-    </div>
-  </div>
+
+
 </template>
 <script>
   import echarts from 'echarts';
   import 'echarts/map/js/china.js' // 引入中国地图数据
+  import icons from '@/icon/kaimr.png';
   // import { initOption as ioption } from 'liquidfillOptions.js'
   export default {
     name: '',
     data() {
       return {
         img: require('@/icon/pic_map.png'),
-        opt: ioption,
+        /* opt: ioption,*/
         map: '',
+        mapv: '',
+        sensor: [], //传感器流量
+        sensors: [], //传感器流量
+        number: [],
+        numbers: [],
+        atmospheres:[],
+        atmospheretwo:[],
+        max:88,
+        isVideo:false,
+        showJK:false,
+        yu:false,
+        pickerOptions0: {
+          disabledDate: (time) => {
+            if(this.toTime != "") {
+              return time.getTime() > Date.now() || time.getTime() > new Date(this.toTime).getTime();
+            } else {
+              return time.getTime() > Date.now();
+            }
+          }
+        },
+        pickerOptions1: {
+          disabledDate: (time) => {
+            return time.getTime() > Date.now() || time.getTime() < new Date(this.fromTime).getTime();
+          }
+        },
+        isShow: true,
+        mapData: [{
+          DataSet: null,
+          mapvLayer: null,
+          options: {
+            fillStyle: 'rgba(0,255,255, 0.9)',
+            size: 1.1,
+            draw: 'simple',
+            bigData: 'Point'
+          }
+        }, {
+          DataSet: null,
+          mapvLayer: null,
+          options: {
+            fillStyle: 'rgba(0,191,255, 0.9)',
+            size: 1.1,
+            draw: 'simple',
+            bigData: 'Point'
+          }
+        },
+          {
+            DataSet: null,
+            mapvLayer: null,
+            options: {
+              fillStyle: 'rgba(138,43,226, 0.9)',
+              size: 1.1,
+              draw: 'simple',
+              bigData: 'Point'
+            }
+          },
+          {
+            DataSet: null,
+            mapvLayer: null,
+            options: {
+              fillStyle: 'rgba(218,112,214, 0.9)',
+              size: 1.1,
+              draw: 'simple',
+              bigData: 'Point'
+            }
+          },
+          {
+            DataSet: null,
+            mapvLayer: null,
+            options: {
+              fillStyle: 'rgba(30,144,255, 0.9)',
+              size: 1.1,
+              draw: 'simple',
+              bigData: 'Point'
+            }
+          },
+          {
+            DataSet: null,
+            mapvLayer: null,
+            options: {
+              fillStyle: 'rgba(0,128,0, 0.9)',
+              size: 1.1,
+              draw: 'simple',
+              bigData: 'Point'
+            }
+          },
+          {
+            DataSet: null,
+            mapvLayer: null,
+            options: {
+              fillStyle: 'rgba(255,255,0, 0.9)',
+              size: 1.1,
+              draw: 'simple',
+              bigData: 'Point'
+            }
+          },
+          {
+            DataSet: null,
+            mapvLayer: null,
+            options: {
+              fillStyle: 'rgba(255,0,0, 0.9)',
+              size: 1.1,
+              draw: 'simple',
+              bigData: 'Point'
+            }
+          }
+        ],
+        timer: null,
+        pro:''
       }
     },
 
     methods: {
+      // 大图
       auto() {
-        this.map = new BMap.Map(this.$refs.allmap, {
-          enableMapClick: false
-        });
-        this.map.centerAndZoom(new BMap.Point(105.403119, 38.028658), 5);  // 初始化地图,设置中心点坐标和地图级别
-        this.map.enableScrollWheelZoom(true); // 开启鼠标滚轮缩放
-        this.map.setMapStyle({
-          styleJson: [{
-            "featureType": "water",
-            "elementType": "all",
-            "stylers": {
-              "color": "#044161"
-            }
-          }, {
-            "featureType": "land",
-            "elementType": "all",
-            "stylers": {
-              "color": "#091934"
-            }
-          }, {
-            "featureType": "boundary",
-            "elementType": "geometry",
-            "stylers": {
-              "color": "#064f85"
-            }
-          }, {
-            "featureType": "railway",
-            "elementType": "all",
-            "stylers": {
-              "visibility": "off"
-            }
-          }, {
-            "featureType": "highway",
-            "elementType": "geometry",
-            "stylers": {
-              "visibility": "off"
-            }
-          }, {
-            "featureType": "highway",
-            "elementType": "geometry.fill",
-            "stylers": {
-              "visibility": "off"
-            }
-          }, {
-            "featureType": "highway",
-            "elementType": "labels",
-            "stylers": {
-              "visibility": "off"
-            }
-          }, {
-            "featureType": "arterial",
-            "elementType": "geometry",
-            "stylers": {
-              "color": "#004981",
-              "lightness": -39
-            }
-          }, {
-            "featureType": "arterial",
-            "elementType": "geometry.fill",
-            "stylers": {
-              "color": "#00508b"
-            }
-          }, {
-            "featureType": "poi",
-            "elementType": "all",
-            "stylers": {
-              "visibility": "off"
-            }
-          }, {
-            "featureType": "green",
-            "elementType": "all",
-            "stylers": {
-              "color": "#056197",
-              "visibility": "off"
-            }
-          }, {
-            "featureType": "subway",
-            "elementType": "all",
-            "stylers": {
-              "visibility": "off"
-            }
-          }, {
-            "featureType": "manmade",
-            "elementType": "all",
-            "stylers": {
-              "visibility": "off"
-            }
-          }, {
-            "featureType": "local",
-            "elementType": "all",
-            "stylers": {
-              "visibility": "off"
-            }
-          }, {
-            "featureType": "arterial",
-            "elementType": "labels",
-            "stylers": {
-              "visibility": "off"
-            }
-          }, {
-            "featureType": "boundary",
-            "elementType": "geometry.fill",
-            "stylers": {
-              "color": "#029fd4"
-            }
-          }, {
-            "featureType": "building",
-            "elementType": "all",
-            "stylers": {
-              "color": "#1a5787"
-            }
-          }, {
-            "featureType": "label",
-            "elementType": "all",
-            "stylers": {
-              "visibility": "off"
-            }
-          }, {
-            "featureType": "poi",
-            "elementType": "labels.text.fill",
-            "stylers": {
-              "color": "#ffffff"
-            }
-          }, {
-            "featureType": "poi",
-            "elementType": "labels.text.stroke",
-            "stylers": {
-              "color": "#1e1c1c"
-            }
-          }, {
-            "featureType": "administrative",
-            "elementType": "labels",
-            "stylers": {
-              "visibility": "on"
-            }
-          }, {
-            "featureType": "road",
-            "elementType": "labels",
-            "stylers": {
-              "visibility": "off"
-            }
-          }]
-        });
-      },
-      hold() {
-  /*      /!*this.$http.get('examples/data/weibo.json',{
-
-        }).then(res => {
-          console.log(res,'resres')
-        })*!/
-        this.$http.get('holecoverServer/alarm', {})
+        this.initMap();
+        this.$http.get('/holecoverServer/status')
           .then(res => {
-            if (res.status === 200 || res.status === '200') {
-              let assig = res.data.rows;
-              console.log(res.data, 'resres');
-            } else {
-              alert('接口错误')
-            }
-            // this.yuyu = res.Secondcover;
-
-          });*/
+            this.initMapOfData(res.data.rows);
+          });
       },
-      autos(){
+      // 传感器类型
+      hold() {
+        this.sensor = [];
+        this.sensors = [];
+        this.$http.get('holecoverServer/getResSensorFlow')
+          .then(res => {
+            let _this = this;
+            let rs = res.data.rows;
+            rs.forEach(function (row) {
+              _this.sensor.push(row.category);
+              _this.sensors.push(row.total);
+            });
+            this.statistics();
+          });
+      },
+      // 蜘蛛网
+      autos() {
         let brr = echarts.init(this.$refs.Rightloginoe);
-      /*  let option = {
-          title : {
-            text: '访问 vs 咨询',
-            subtext: '各个数据的集合'
-          },
-          tooltip : {
-            trigger: 'item',
-            formatter: "{b}: {c}"
-          },
-          toolbox: {
-            show : true,
-            feature : {
-              mark : {show: true},
-              dataView : {show: true, readOnly: false},
-              restore : {show: true},
-              saveAsImage : {show: true}
-            }
-          },
-          calculable : false,
-          series : [
-            {
-              name:'韦恩图',
-              type:'venn',
-              itemStyle: {
-                normal: {
-                  label: {
-                    show: true,
-                    textStyle: {
-                      fontFamily: 'Arial, Verdana, sans-serif',
-                      fontSize: 16,
-                      fontStyle: 'italic',
-                      fontWeight: 'bolder'
-                    }
-                  },
-                  labelLine: {
-                    show: false,
-                    length: 10,
-                    lineStyle: {
-                      // color: 各异,
-                      width: 1,
-                      type: 'solid'
-                    }
-                  }
-                },
-                emphasis: {
-                  color: '#cc99cc',
-                  borderWidth: 3,
-                  borderColor: '#996699'
-                }
-              },
-              data:[
-                {value:100, name:'访问'},
-                {value:50, name:'咨询'},
-                {value:20, name:'公共'}
-              ]
-            }
-          ]
-        };*/
-        // Schema:
-// date,AQIindex,PM2.5,PM10,CO,NO2,SO2
-        let dataBJ = [
-          [55,9,56,0.46,18,6,1],
-          [25,11,21,0.65,34,9,2],
-          [56,7,63,0.3,14,5,3],
-          [33,7,29,0.33,16,6,4],
-          [42,24,44,0.76,40,16,5],
-          [82,58,90,1.77,68,33,6],
-          [74,49,77,1.46,48,27,7],
-          [78,55,80,1.29,59,29,8],
-          [267,216,280,4.8,108,64,9],
-          [185,127,216,2.52,61,27,10],
-          [39,19,38,0.57,31,15,11],
-          [41,11,40,0.43,21,7,12],
-          [64,38,74,1.04,46,22,13],
-          [108,79,120,1.7,75,41,14],
-          [108,63,116,1.48,44,26,15],
-          [33,6,29,0.34,13,5,16],
-          [94,66,110,1.54,62,31,17],
-          [186,142,192,3.88,93,79,18],
-          [57,31,54,0.96,32,14,19],
-          [22,8,17,0.48,23,10,20],
-          [39,15,36,0.61,29,13,21],
-          [94,69,114,2.08,73,39,22],
-          [99,73,110,2.43,76,48,23],
-          [31,12,30,0.5,32,16,24],
-          [42,27,43,1,53,22,25],
-          [154,117,157,3.05,92,58,26],
-          [234,185,230,4.09,123,69,27],
-          [160,120,186,2.77,91,50,28],
-          [134,96,165,2.76,83,41,29],
-          [52,24,60,1.03,50,21,30],
-          [46,5,49,0.28,10,6,31]
-        ];
-
-        let dataGZ = [
-          [26,37,27,1.163,27,13,1],
-          [85,62,71,1.195,60,8,2],
-          [78,38,74,1.363,37,7,3],
-          [21,21,36,0.634,40,9,4],
-          [41,42,46,0.915,81,13,5],
-          [56,52,69,1.067,92,16,6],
-          [64,30,28,0.924,51,2,7],
-          [55,48,74,1.236,75,26,8],
-          [76,85,113,1.237,114,27,9],
-          [91,81,104,1.041,56,40,10],
-          [84,39,60,0.964,25,11,11],
-          [64,51,101,0.862,58,23,12],
-          [70,69,120,1.198,65,36,13],
-          [77,105,178,2.549,64,16,14],
-          [109,68,87,0.996,74,29,15],
-          [73,68,97,0.905,51,34,16],
-          [54,27,47,0.592,53,12,17],
-          [51,61,97,0.811,65,19,18],
-          [91,71,121,1.374,43,18,19],
-          [73,102,182,2.787,44,19,20],
-          [73,50,76,0.717,31,20,21],
-          [84,94,140,2.238,68,18,22],
-          [93,77,104,1.165,53,7,23],
-          [99,130,227,3.97,55,15,24],
-          [146,84,139,1.094,40,17,25],
-          [113,108,137,1.481,48,15,26],
-          [81,48,62,1.619,26,3,27],
-          [56,48,68,1.336,37,9,28],
-          [82,92,174,3.29,0,13,29],
-          [106,116,188,3.628,101,16,30],
-          [118,50,0,1.383,76,11,31]
-        ];
-
-        let dataSH = [
-          [91,45,125,0.82,34,23,1],
-          [65,27,78,0.86,45,29,2],
-          [83,60,84,1.09,73,27,3],
-          [109,81,121,1.28,68,51,4],
-          [106,77,114,1.07,55,51,5],
-          [109,81,121,1.28,68,51,6],
-          [106,77,114,1.07,55,51,7],
-          [89,65,78,0.86,51,26,8],
-          [53,33,47,0.64,50,17,9],
-          [80,55,80,1.01,75,24,10],
-          [117,81,124,1.03,45,24,11],
-          [99,71,142,1.1,62,42,12],
-          [95,69,130,1.28,74,50,13],
-          [116,87,131,1.47,84,40,14],
-          [108,80,121,1.3,85,37,15],
-          [134,83,167,1.16,57,43,16],
-          [79,43,107,1.05,59,37,17],
-          [71,46,89,0.86,64,25,18],
-          [97,71,113,1.17,88,31,19],
-          [84,57,91,0.85,55,31,20],
-          [87,63,101,0.9,56,41,21],
-          [104,77,119,1.09,73,48,22],
-          [87,62,100,1,72,28,23],
-          [168,128,172,1.49,97,56,24],
-          [65,45,51,0.74,39,17,25],
-          [39,24,38,0.61,47,17,26],
-          [39,24,39,0.59,50,19,27],
-          [93,68,96,1.05,79,29,28],
-          [188,143,197,1.66,99,51,29],
-          [174,131,174,1.55,108,50,30],
-          [187,143,201,1.39,89,53,31]
-        ];
-
-        let lineStyle = {
-          normal: {
-            width: 1,
-            opacity: 0.5
-          }
-        };
-
-        let option = {
-          legend: {
-            bottom: 5,
-            data: ['北京', '上海', '广州'],
-            itemGap: 20,
-            textStyle: {
-              color: '#fff',
-              fontSize: 14
-            },
-            selectedMode: 'single'
-          },
-          // visualMap: {
-          //     show: true,
-          //     min: 0,
-          //     max: 20,
-          //     dimension: 6,
-          //     inRange: {
-          //         colorLightness: [0.5, 0.8]
-          //     }
-          // },
-          radar: {
-            indicator: [
-              {name: 'AQI', max: 300},
-              {name: 'PM2.5', max: 250},
-              {name: 'PM10', max: 300},
-              {name: 'CO', max: 5},
-              {name: 'NO2', max: 200},
-              {name: 'SO2', max: 100}
-            ],
-            shape: 'circle',
-            splitNumber: 5,
-            name: {
-              textStyle: {
-                color: 'rgb(238, 197, 102)'
-              }
-            },
-            splitLine: {
-              lineStyle: {
-                color: [
-                  'rgba(238, 197, 102, 0.1)', 'rgba(238, 197, 102, 0.2)',
-                  'rgba(238, 197, 102, 0.4)', 'rgba(238, 197, 102, 0.6)',
-                  'rgba(238, 197, 102, 0.8)', 'rgba(238, 197, 102, 1)'
-                ].reverse()
-              }
-            },
-            splitArea: {
-              show: false
-            },
-            axisLine: {
-              lineStyle: {
-                color: 'rgba(238, 197, 102, 0.5)'
-              }
-            }
-          },
-          series: [
-            {
-              name: '北京',
-              type: 'radar',
-              lineStyle: lineStyle,
-              data: dataBJ,
-              symbol: 'none',
-              itemStyle: {
-                normal: {
-                  color: '#F9713C'
-                }
-              },
-              areaStyle: {
-                normal: {
-                  opacity: 0.1
-                }
-              }
-            },
-            {
-              name: '上海',
-              type: 'radar',
-              lineStyle: lineStyle,
-              data: dataSH,
-              symbol: 'none',
-              itemStyle: {
-                normal: {
-                  color: '#B3E4A1'
-                }
-              },
-              areaStyle: {
-                normal: {
-                  opacity: 0.05
-                }
-              }
-            },
-            {
-              name: '广州',
-              type: 'radar',
-              lineStyle: lineStyle,
-              data: dataGZ,
-              symbol: 'none',
-              itemStyle: {
-                normal: {
-                  color: 'rgb(238, 197, 102)'
-                }
-              },
-              areaStyle: {
-                normal: {
-                  opacity: 0.05
-                }
-              }
-            }
-          ]
-        };
-        brr.setOption(option);
-      },
-      Typeratio(){
-        let brr = echarts.init(this.$refs.Leftloginone);
-        let sourceBar = {
-          "itemData": ["井盖", "路灯", "压力", "视频", "雨量计", "液位表"],
-          "seriesData": [400, 302, 250, 157, 231, 300]
-        };
-        let itemData = sourceBar.itemData;
-        let seriesData = sourceBar.seriesData;
-        let tooltip = sourceBar.tooltip;
-        let color = ['#00b9f6', '#38a97d', '#004eff', '#17c7e7', '#4e85ea', '#e49be9', '#078d9d', '#eca52a', '#ef9544', '#ea3b3b']
-
-        let data = {};
-        for (let k in itemData) {
-          data[itemData[k]] = seriesData[k];
-        }
-
-        let xAxisData = [];
-        let dataArr = [];
-        for (let i in data) {
-          xAxisData.push(i);
-          dataArr.push(data[i]);
-        }
-
-        let option = {
-          grid: {
-            top: '25%',
-            left: '5%',
-            right: '10%',
-            bottom: '8%',
-            containLabel: true
-          },
-          tooltip: {
-            show: "true",
-            trigger: 'axis',
-            axisPointer: { // 坐标轴指示器，坐标轴触发有效
-              type: 'shadow', // 默认为直线，可选为：'line' | 'shadow'
-              shadowStyle: {
-                color: 'rgba(112,112,112,0)',
-              },
-            },
-            formatter: function(params) {
-              let unit = params[0].name.substring(params[0].name.indexOf('(') + 1, params[0].name.indexOf(')'));
-              return params[0].name + '：' + params[0].value + '条数据';
-            },
-            // backgroundColor: 'rgba(0,0,0,0.7)', // 背景
-            padding: [8, 10], //内边距
-            // extraCssText: 'box-shadow: 0 0 3px rgba(255, 255, 255, 0.4);', //添加阴影
-          },
-          xAxis: [{
-            show: true,
-            name: '来源',
-            nameTextStyle: {
-              fontSize: 14,
-              fontFamily: 'Microsoft YaHei',
-              color: '#fff'
-            },
-            type: 'category',
-            nameLocation: 'end',
-            nameGap: 8,
-            axisLabel: {
-              fontSize: 16,
-              fontFamily: 'Microsoft YaHei',
-              color: "#fff",
-              interval: 0,
-              margin: 16,
-              formatter: function(params) {
-                if (params.length > 6) {
-                  params = params.substr(0, 6) + "...";
-                } else {
-                  params = params;
-
-                }
-                return params;
-              }
-            },
-            axisLine: {
-              show: true,
-              symbol: ['none', 'arrow'],
-              lineStyle: {
-                color: '#05edfc'
-              }
-            },
-            data: xAxisData
-          }, {
-            type: 'category',
-            axisLine: {
-              show: false
-            },
-            axisTick: {
-              show: false
-            },
-            axisLabel: {
-              show: false
-            },
-            splitArea: {
-              show: false
-            },
-            splitLine: {
-              show: false
-            },
-            data: xAxisData
-          }, {
-            type: 'category',
-            axisLine: {
-              show: false
-            },
-            axisTick: {
-              show: false
-            },
-            axisLabel: {
-              show: false
-            },
-            splitArea: {
-              show: false
-            },
-            splitLine: {
-              show: false
-            },
-            data: xAxisData
+        var radius = '50%';
+        var leiDaCenter = ['50%', '58%'];
+        var leiDadata = [{
+          name: "市中区",
+          max: 10,
+          pre: 32
+        }, {
+          name: "槐荫市",
+          max: 10,
+          pre: 3
+        }, {
+          name: "天桥区",
+          max: 10,
+          pre: 3
+        }, {
+          name: "历程区",
+          max: 10,
+          pre: 5.5
+        }, {
+          name: "长清区",
+          max: 10,
+          pre: 5
+        }, {
+          name: "平阴县",
+          max: 10,
+          pre: 3
+        }, {
+          name: "章丘市",
+          max: 10,
+          pre: 2
+        }, {
+          name: "济阳县",
+          max: 10,
+          pre: 2
+        }, {
+          name: "商河县",
+          max: 10,
+          pre: 2
+        }];
+        var radarAllDatas = [
+          [{
+            name: "10月"
           }],
-          yAxis: {
-            type: 'value',
-            name: '数量',
-            nameTextStyle: {
-              fontSize: 12,
-              fontFamily: 'Microsoft YaHei',
-              color: '#fff'
-            },
-            minInterval: 1,
-            nameLocation: 'end',
-            nameGap: 10,
-            splitLine: {
-              show: false
-            },
-            axisLabel: {
-              show: true,
-              fontSize: 12,
-              fontFamily: 'Arial',
-              color: "#fff"
-            },
-            axisLine: {
-              show: true,
-              symbol: ['none', 'arrow'],
-              lineStyle: {
-                color: '#05edfc'
+          [{
+            name: "11月"
+          }],
+          [{
+            name: "12月",
+          }]
+        ]
+        var colorListRadar = ["#00faf7", "#f19049", "#c6fc5e"];
+        var leiDaArr = []; //雷达图
+        var leiDaXzhou = []; //轮播的名称
+        var legendLeiDa = []; //用于装legend的
+        var displayLeiDaAllTitle = []; //显示雷达图的参数
+        for (let z = 0; z < radarAllDatas.length; z++) {
+          leiDaXzhou.push(radarAllDatas[z][0].name);
+          legendLeiDa.push({
+            name: radarAllDatas[z][0].name,
+            icon: "circle"
+          });
+          leiDaArr.push({
+            name: radarAllDatas[z][0].name,
+            type: 'radar',
+            symbol: "circle",
+            symbolSize: 10,
+            itemStyle: {
+              normal: {
+                color: colorListRadar[z],
               }
-            }
-          },
-          series: [{
-            type: 'bar',
-            stack: 1,
-            xAxisIndex: 0,
-            barWidth: 10,
-            barGap: 5,
-            z: 2,
-            data: function() {
-              let itemArr = [];
-              for (let i = 1; i < (dataArr.length + 1); i++) {
-                let item = {
-                  value: dataArr[i - 1],
-                  itemStyle: {
-                    normal: {
-                      barBorderRadius: 50,
-                      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                        offset: 0,
-                        color: color[translateColor(i) * 2 - 2]
-                      }, {
-                        offset: 1,
-                        color: color[translateColor(i) * 2 - 1]
-                      }]),
-                    }
-                  }
-                };
-                itemArr.push(item);
+            },
+            areaStyle: {
+              normal: {
+                color: colorListRadar[z],
+                opacity: 0.6
+              },
+            },
+            lineStyle: {
+              normal: {
+                color: colorListRadar[z],
+                type: 'solid',
+                width: 3,
+                opacity: 1
               }
-              return itemArr;
-            }()
-          },
-            {
-              type: 'scatter',
-              stack: 1,
-              symbolOffset: [0, 0], //相对于原本位置的偏移量
+            },
+            data: radarAllDatas[z]
+          })
+        }
+
+        let option = {
+          baseOption: {
+            timeline: {
+              show: false,
+              type: 'slider',
+              axisType: 'category',
+              bottom: '0',
+              currentIndex: 0, //0 时表示当前选中项为 timeline.data[0]（即使用 options[0]
+              autoPlay: true, //是否自动播放
+              loop: true,
+              rewind: true, //反向轮播
+              realtime: true, //拖动圆点的时候，是否实时更新视图。
+              controlPosition: 'left',
               label: {
                 normal: {
-                  show: false,
-                }
+                  color: '#2998ff',
+                },
               },
-              xAxisIndex: 2,
-              symbolSize: 10,
-              z: 2,
-              data: function() {
-                let itemArr = [];
-                for (let i = 1; i < (dataArr.length + 1); i++) {
-                  let item = {
-                    value: 0,
-                    itemStyle: {
-                      normal: {
-                        borderColor: '#fff',
-                        borderWidth: 2,
-                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                          offset: 0,
-                          color: color[translateColor(i) * 2 - 2]
-                        }, {
-                          offset: 1,
-                          color: color[translateColor(i) * 2 - 1]
-                        }]),
-                      }
-                    }
-                  };
-                  itemArr.push(item);
-                }
-                return itemArr;
-              }()
-            },
-            {
-              type: 'bar',
-              xAxisIndex: 1,
-              barGap: '140%',
-              data: dataArr,
-              barWidth: 22,
               itemStyle: {
                 normal: {
-                  barBorderRadius: 50,
-                  color: '#0e2147'
+                  color: '#fff',
+                  borderColor: '#2998ff',
+                  borderWidth: 2,
                 }
               },
-              z: 1
+              checkpointStyle: { //『当前项』（checkpoint）的图形样式
+                color: 'rgb(215, 0, 0)',
+              },
+              lineStyle: {
+                show: true, //false 不显示轴线
+                color: '#2998ff',
+              },
+              controlStyle: { //控制按钮的样式
+                show: true,
+                showPrevBtn: true,
+                showNextBtn: true,
+                itemGap: 50,
+                itemSize: 36,
+                normal: {
+                  color: 'rgb(215, 0, 0)',
+                  borderColor: 'rgb(215, 0, 0)',
+                },
+                emphasis: {
+                  color: 'rgb(215, 0, 0)',
+                  borderColor: 'rgb(215, 0, 0)',
+                },
+              },
+              data: leiDaXzhou,
             },
-            {
-              type: 'bar',
-              xAxisIndex: 2,
-              barWidth: 25,
-              barGap: 1,
-              z: 0,
-              data: function() {
-                let itemArr = [];
-                for (let i = 1; i < (dataArr.length + 1); i++) {
-                  let item = {
-                    value: dataArr[i - 1],
-                    itemStyle: {
-                      normal: {
-                        barBorderRadius: 50,
-                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                          offset: 0,
-                          color: color[translateColor(i) * 2 - 2]
-                        }, {
-                          offset: 1,
-                          color: color[translateColor(i) * 2 - 1]
-                        }]),
-                      }
-                    }
-                  };
-                  itemArr.push(item);
-                }
-                return itemArr;
-              }()
+            legend: {
+              show: true,
+              orient: 'vertical',
+              top: '1%',
+              left: '0.5%',
+              itemWidth: 10,
+              textStyle: {
+                fontSize: 13,
+                color: "#fff"
+              },
+              data: legendLeiDa
             },
-            {
-              type: 'scatter',
-              hoverAnimation: false,
-              xAxisIndex: 2,
-              symbolOffset: [0, 0], //相对于原本位置的偏移量
-              symbolSize: 18,
-              z: 2,
-              data: function() {
-                let itemArr = [];
-                for (let i = 1; i < (dataArr.length + 1); i++) {
-                  let item = {
-                    value: 0,
-                    itemStyle: {
-                      normal: {
-                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                          offset: 0,
-                          color: color[translateColor(i) * 2 - 2]
-                        }, {
-                          offset: 1,
-                          color: color[translateColor(i) * 2 - 1]
-                        }]),
-                      }
-                    }
-                  };
-                  itemArr.push(item);
+            radar: [{
+              indicator: leiDadata,
+              radius: radius,
+              center: leiDaCenter,
+              startAngle: 126,
+              splitNumber: 4,
+              shape: 'circle',
+              name: {
+                show: true,
+                fontSize: 12,
+                color: "#fff",
+                formatter: function(value, indicator) {
+                  return indicator.name + ' ' + indicator.pre
+                },
+              },
+              nameGap: 25,
+              splitArea: {
+                areaStyle: {
+                  color: 'transparent',
+                  shadowBlur: 10
                 }
-                return itemArr;
-              }()
-            }
-          ]
-        };
+              },
+              axisLine: {
+                lineStyle: {
+                  color: '#0095B0'
+                }
+              },
+              splitLine: {
+                lineStyle: {
+                  color: 'rgba(0,155,226,0.6)'
+                }
+              },
+              indicator: leiDadata
+            },
 
-        function translateColor(index) {
-          if (index > 5) {
-            return translateColor(index - 5)
-          }
-          return index
+            ],
+
+            series: leiDaArr //series结束
+          },
+          options: [{
+            radar: [{
+              indicator: [{
+                name: "市中区",
+                max: 10,
+                pre: 8
+              }, {
+                name: "槐荫市",
+                max: 10,
+                pre: 8
+              }, {
+                name: "天桥区",
+                max: 10,
+                pre: 8
+              }, {
+                name: "历程区",
+                max: 10,
+                pre: 8
+              }, {
+                name: "长清区",
+                max: 10,
+                pre: 8
+              }, {
+                name: "平阴县",
+                max: 10,
+                pre: 8
+              },{
+                name: "章丘市",
+                max: 10,
+                pre: 8
+              },
+                {
+                  name: "济阳县",
+                  max: 10,
+                  pre: 8
+                }, {
+                  name: "商河县",
+                  max: 10,
+                  pre: 9
+                }
+              ]
+            }],
+            series: [{
+              z: 1,
+              itemStyle: {
+                normal: {
+                  opacity: 0.2
+                }
+              },
+              areaStyle: {
+                normal: {
+                  opacity: 0.2
+                }
+              },
+              lineStyle: {
+                normal: {
+                  opacity: 0.2
+                }
+              },
+              data: [{
+                value: [8, 8.5, 8.5, 8.5, 9, 7, 8, 8, 5]
+              }]
+            }, {
+              z: 1,
+              itemStyle: {
+                normal: {
+                  opacity: 0.2
+                }
+              },
+              areaStyle: {
+                normal: {
+                  opacity: 0.2
+                }
+              },
+              lineStyle: {
+                normal: {
+                  opacity: 0.2
+                }
+              },
+              data: [{
+                value: [8, 8.5, 8.5, 8.5, 9, 7, 8, 8, 5]
+              }]
+            }, {
+              z: 3,
+              itemStyle: {
+                normal: {
+                  opacity: 1
+                }
+              },
+              areaStyle: {
+                normal: {
+                  opacity: 0.6
+                }
+              },
+              lineStyle: {
+                normal: {
+                  opacity: 1
+                }
+              },
+              data: [{
+                value: [8, 8.5, 8.5, 8.5, 9, 7, 8, 8, 5]
+              }]
+            }]
+          },
+            {
+              radar: [{
+                indicator: [{
+                  name: "市中区",
+                  max: 10,
+                  pre: 7
+                }, {
+                  name: "槐荫市",
+                  max: 10,
+                  pre: 7
+                }, {
+                  name: "天桥区",
+                  max: 10,
+                  pre: 8
+                }, {
+                  name: "历程区",
+                  max: 10,
+                  pre: 7
+                }, {
+                  name: "长清区",
+                  max: 10,
+                  pre: 8
+                }, {
+                  name: "平阴县",
+                  max: 10,
+                  pre: 8
+                },
+                  {
+                    name: "章丘市",
+                    max: 10,
+                    pre: 7
+                  }, {
+                    name: "济阳县",
+                    max: 10,
+                    pre: 8
+                  }, {
+                    name: "商河县",
+                    max: 10,
+                    pre: 7
+                  }
+                ]
+              }],
+              series: [{
+                z: 1,
+                itemStyle: {
+                  normal: {
+                    opacity: 0.2
+                  }
+                },
+                areaStyle: {
+                  normal: {
+                    opacity: 0.2
+                  }
+                },
+                lineStyle: {
+                  normal: {
+                    opacity: 0.2
+                  }
+                },
+                data: [{
+                  value: [8, 8.5, 8.5, 8.5, 9, 7, 8, 7, 4]
+                }]
+              }, {
+                z: 3,
+                itemStyle: {
+                  normal: {
+                    opacity: 1
+                  }
+                },
+                areaStyle: {
+                  normal: {
+                    opacity: 0.6
+                  }
+                },
+                lineStyle: {
+                  normal: {
+                    opacity: 1
+                  }
+                },
+                data: [{
+                  value: [7, 7, 6, 6, 6, 7.5, 5, 8, 6]
+                }]
+              }, {
+                z: 1,
+                itemStyle: {
+                  normal: {
+                    opacity: 0.2
+                  }
+                },
+                areaStyle: {
+                  normal: {
+                    opacity: 0.2
+                  }
+                },
+                lineStyle: {
+                  normal: {
+                    opacity: 0.2
+                  }
+                },
+                data: [{
+                  value: [7, 7, 6, 6, 6, 7.5, 5, 8, 6]
+                }]
+              }]
+            },
+            {
+              radar: [{
+                indicator: [{
+                  name: "市中区",
+                  max: 10,
+                  pre: 8
+                }, {
+                  name: "槐荫市",
+                  max: 10,
+                  pre: 8.5
+                }, {
+                  name: "天桥区",
+                  max: 10,
+                  pre: 8.5
+                }, {
+                  name: "历程区",
+                  max: 10,
+                  pre: 8.5
+                }, {
+                  name: "长清区",
+                  max: 10,
+                  pre: 9
+                }
+                  , {
+                    name: "平阴县",
+                    max: 10,
+                    pre: 7
+                  },
+                  {
+                    name: "章丘市",
+                    max: 10,
+                    pre: 5.5
+                  }, {
+                    name: "济阳县",
+                    max: 10,
+                    pre: 5
+                  }, {
+                    name: "商河县",
+                    max: 10,
+                    pre: 3
+                  }
+                ]
+              }],
+              series: [{
+                z: 3,
+                itemStyle: {
+                  normal: {
+                    opacity: 1
+                  }
+                },
+                areaStyle: {
+                  normal: {
+                    opacity: 0.6
+                  }
+                },
+                lineStyle: {
+                  normal: {
+                    opacity: 1
+                  }
+                },
+                data: [{
+                  value: [8, 8.5, 8.5, 8.5, 9, 7, 5.5 , 5, 3]
+                }]
+              }, {
+                z: 1,
+                itemStyle: {
+                  normal: {
+                    opacity: 0.2
+                  }
+                },
+                areaStyle: {
+                  normal: {
+                    opacity: 0.2
+                  }
+                },
+                lineStyle: {
+                  normal: {
+                    opacity: 0.2
+                  }
+                },
+                data: [{
+                  value: [8, 8.5, 8.5, 8.5, 9, 7, 5.5 , 5, 3]
+                }]
+              }, {
+                z: 1,
+                itemStyle: {
+                  normal: {
+                    opacity: 0.2
+                  }
+                },
+                areaStyle: {
+                  normal: {
+                    opacity: 0.2
+                  }
+                },
+                lineStyle: {
+                  normal: {
+                    opacity: 0.2
+                  }
+                },
+                data: [{
+                  value:[8, 8.5, 8.5, 8.5, 9, 7, 5.5 , 5, 3]
+                }]
+              }]
+            },
+          ]
         }
         brr.setOption(option);
       },
-      Thermodynamic(){
-        let brr = echarts.init(this.$refs.Leftlogintwo);
-        // 数据格式 [经度，纬度]
-        let heatData = [[116.11,39.852],
-          [116.21,39.952],
-          [116.31,39.957],
-          [116.41,39.959],
-        ];
+      // 蜘蛛网
+      atmosphere(){
+        this.atmospheretwo = [];
+        this.atmospheres = [];
+        this.$http.get('holecoverServer/getResSensorAir')
+          .then(res => {
+            let _this = this;
+            let rs = res.data.rows;
+            rs.forEach(function (row) {
+              _this.atmospheretwo.push({
+                max: '100',
+                name: row.category,
+              });
+              _this.atmospheres.push(row.total)
+            });
+            this.autos();
+            console.log( _this.atmospheretwo,'yuyudddd');
+            console.log( _this.atmospheres,'yuyudddd');
+          });
+      },
+      // 柱形图
+      Typeratio() {
+        let brr = echarts.init(this.$refs.Leftloginone);
+        var plantCap = [{
+          name: '总数',
+          value: '3680'
+        }, {
+          name: '废水企业',
+          value: '2100'
+        }, {
+          name: '放射源企业',
+          value: '380'
+        }, {
+          name: '固废企业',
+          value: '300'
+        }, {
+          name: '废气企业',
+          value: '700'
+        }];
 
-        let option = {
-          color: ['red','yellow','#d8e050'],
-          tooltip : {
-            trigger: 'item',
-            formatter: '{b}'
+        var datalist = [{
+          offset: [52, 48],
+          symbolSize: 120,
+          fontSize: 28,
+          opacity: .95,
+          color: '#f467ce'
+        }, {
+          offset: [20, 78],
+          symbolSize: 95,
+          opacity: .88,
+          color: '#7aabe2'
+        }, {
+          offset: [7, 23],
+          symbolSize: 90,
+          opacity: .84,
+          color: '#ff7123'
+        }, {
+          offset: [87, 80],
+          symbolSize: 90,
+          opacity: .8,
+          color: '#ffc400'
+        }, {
+          offset: [86, 22],
+          symbolSize: 80,
+          opacity: .7,
+          color: '#178eeb'
+        }];
+        var datas = [];
+        for (var i = 0; i < plantCap.length; i++) {
+          var item = plantCap[i];
+          var itemToStyle = datalist[i];
+          datas.push({
+            name: item.value + '\n' + item.name,
+            value: itemToStyle.offset,
+            symbolSize: itemToStyle.symbolSize,
+            label: {
+              normal: {
+                textStyle: {
+                  fontSize: 14
+                }
+              }
+            },
+            itemStyle: {
+              normal: {
+                color: itemToStyle.color,
+                opacity: itemToStyle.opacity
+              }
+            },
+          })
+        }
+        var option = {
+          grid: {
+            show: false,
+            top: 10,
+            bottom: 10
           },
-          series : [
-            {
-              name: '妥投量',
-              type: 'map',
-              mapType: '北京',
-              roam: false,
-              mapLocation:{x:'center',y:'2%'},
-              itemStyle:{
-                normal:{
-                  label:{
-                    show:true,
-                    textStyle:{
-                      fontSize : '12',
-                      fontFamily:'Microsoft YaHei',
-                      color:'#00ffff'
-                    }
-                  },
-                  borderColor:'#5ef9f7',
-                  borderWidth:1,
-                  areaStyle:{
-                    color: '#210874'
-                  }
+          xAxis: [{
+            gridIndex: 0,
+            type: 'value',
+            show: false,
+            min: 0,
+            max: 100,
+            nameLocation: 'middle',
+            nameGap: 5
+          }],
+          yAxis: [{
+            gridIndex: 0,
+            min: 0,
+            show: false,
+            max: 100,
+            nameLocation: 'middle',
+            nameGap: 30
+          }],
+          series: [{
+            type: 'scatter',
+            symbol: 'circle',
+            symbolSize: 120,
+            label: {
+              normal: {
+                show: true,
+                formatter: '{b}',
+                color: '#fff',
+                textStyle: {
+                  fontSize: '20'
                 }
               },
-              data:[],
-              heatmap: {
-                minAlpha: 0.5,
-                data: heatData
-              },
-            }
-          ]
+            },
+            itemStyle: {
+              normal: {
+                color: '#00acea'
+              }
+            },
+            data: datas
+          }]
         };
+
         brr.setOption(option);
       },
-      Analysis(){
+      typeAnalysis(){
+
+        this.$http.get('getFaultRate')
+          .then(res => {
+            let _this = this;
+             console.log(res[0],'898989')
+            let arr = res[0];
+             for(let i = 0; i <arr.length;i++){
+               console.log(arr[i].month,'arr[i].date');
+
+             }
+            this.statistics();
+          });
+      },
+      // 中下
+      Analysis() {
         let brr = echarts.init(this.$refs.Contentloginbottom);
 
         let option = {
-          tooltip: {
-            trigger: 'axis',
-            showContent: false
-          },
-          legend: {
-            data:['邮件营销','联盟广告']
-          },
-          grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-          },
-          toolbox: {
-            feature: {
-              saveAsImage: {}
-            }
-          },
-          dataset: {
-            source: [
-              ['product', '2012', '2013', '2014', '2015', '2016', '2017'],
-              ['Matcha Latte', 41.1, 30.4, 65.1, 53.3, 83.8, 98.7],
-              ['Milk Tea', 86.5, 92.1, 85.7, 83.1, 73.4, 55.1],
-
-            ]
-          },
-          xAxis: {type: 'category'},
-          yAxis: {gridIndex: 0},
-          series: [
-            {type: 'line', smooth: true, seriesLayoutBy: 'row'},
-            {type: 'line', smooth: true, seriesLayoutBy: 'row'},
-
-
-          ]
-        };
-        brr.setOption(option);
-      },
-      statistics(){
-        let brr = echarts.init(this.$refs.Rightlogintwo);
-        let option = {
-          tooltip: {
-          },
-          grid: {
-            top: '8%',
-            left: '1%',
-            right: '1%',
-            bottom: '8%',
-            containLabel: true,
-          },
-          xAxis: [{
-            type: 'category',
-            boundaryGap: false,
-            axisLine: { //坐标轴轴线相关设置。数学上的x轴
-              show: true,
-              lineStyle: {
-                color: '#233e64'
-              },
+          title: [{
+            x: "18%",
+            bottom: 30,
+            text: '水温(℃)',
+            textStyle: {
+              fontWeight: 'normal',
+              fontSize: 15,
+              color: "#65C6E7"
             },
-            axisLabel: { //坐标轴刻度标签的相关设置
-              textStyle: {
-                color: '#6a9cd5',
-                margin:15,
-              },
+          }, {
+            x: "45%",
+            bottom: 30,
+            text: 'PH值',
+            textStyle: {
+              fontWeight: 'normal',
+              fontSize: 15,
+              color: "#65C6E7"
             },
-            axisTick: { show: false,},
-            data: ['6.1', '6.2', '6.3', '6.4', '6.5', '6.6', '6.7'],
+          }, {
+            x: "67%",
+            bottom: 30,
+            text: '浊度(NTU)',
+            textStyle: {
+              fontWeight: 'normal',
+              fontSize: 15,
+              color: "#65C6E7"
+            },
           }],
-          yAxis: [{
-            type: 'value',
-            min: 0,
-            max:140,
-            splitNumber: 7,
-            splitLine: {
-              show: true,
-              lineStyle: {
-                color: '#233e64'
-              }
-            },
-            axisLine: {show: false,},
-            axisLabel: {
-              margin:20,
-              textStyle: {
-                color: '#6a9cd5',
+          tooltip: {
+            trigger: 'item',
+            formatter: "{b}: {c}",
 
-              },
-            },
-            axisTick: { show: false,},
-          }],
+          },
           series: [{
-            name: '异常流量',
-            type: 'line',
-            smooth: true, //是否平滑曲线显示
-// 			symbol:'circle',  // 默认是空心圆（中间是白色的），改成实心圆
-            symbolSize:0,
-
-            lineStyle: {
+            type: 'pie',
+            label: { //标签的位置
               normal: {
-                color: "#3deaff"   // 线条颜色
+                show: false,
               }
             },
-            areaStyle: { //区域填充样式
+            clockwise: false,
+            radius: ['35%', '40%'],
+            center: ['25%', '50%'],
+            data: [{
+              value: 18,
+              name: '水温(℃)',
+              itemStyle: {
+                color: 'rgba(241,192,73,1.0)'
+              }
+            }]
+          }, {
+            name: '',
+            type: 'pie',
+            clockwise: false,
+            silent: true,
+            minAngle: 20, //最小的扇区角度（0 ~ 360）
+            center: ['25%', '50%'], //饼图的中心（圆心）坐标
+            radius: ['0%', '25%'],
+            itemStyle: { //图形样式
               normal: {
-                //线性渐变，前4个参数分别是x0,y0,x2,y2(范围0~1);相当于图形包围盒中的百分比。如果最后一个参数是‘true’，则该四个值是绝对像素位置。
-                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                  { offset: 0,  color: 'rgba(61,234,255, 0.9)'},
-                  { offset: 0.7,  color: 'rgba(61,234,255, 0)'}
-                ], false),
-
-                shadowColor: 'rgba(53,142,215, 0.9)', //阴影颜色
-                shadowBlur: 20 //shadowBlur设图形阴影的模糊大小。配合shadowColor,shadowOffsetX/Y, 设置图形的阴影效果。
+                color: {
+                  type: 'radial',
+                  x: 0.5,
+                  y: 0.5,
+                  r: 0.5,
+                  colorStops: [{
+                    offset: 0,
+                    color: 'rgba(241,192,73,0.5)' // 0% 处的颜色
+                  }, {
+                    offset: 1,
+                    color: 'rgba(241,192,73,1)' // 100% 处的颜色
+                  }],
+                  globalCoord: false // 缺省为 false
+                },
+                borderWidth: 1.5,
+                opacity: 0.21,
               }
             },
-            data: [40, 130, 30, 105, 40, 110, 70]
-          }]
-        };
-        brr.setOption(option);
-      },
-      Wave(){
-        let brr = echarts.init(this.$refs.Rightloginthree);
-        let option = {
-          series: [{
-            type: 'liquidFill',
-            data: [0.7],
-            label:{
-              normal:{
-                textStyle:{
-                  fontSize:10
+            label: { //标签的位置
+              normal: {
+                show: true,
+                align: 'center',
+                position: 'center', //标签的位置
+                formatter: "{c}",
+                fontSize: 20,
+                textStyle: {
+                  color: 'rgba(241,192,73,1.0)',
                 }
               }
             },
+            data: [{
+              value: 18
+            }]
+          }, {
+            type: 'pie',
+            label: { //标签的位置
+              normal: {
+                show: false,
+              }
+            },
+            clockwise: false,
+            radius: ['35%', '40%'],
+            center: ['50%', '50%'],
+            data: [{
+              value: 23,
+              name: 'PH值',
+              itemStyle: {
+                color: 'rgba(48,230,142,1.0)'
+              }
+            }]
+          }, {
+            name: '',
+            type: 'pie',
+            clockwise: false,
+            silent: true,
+            minAngle: 20, //最小的扇区角度（0 ~ 360）
+            center: ['50%', '50%'], //饼图的中心（圆心）坐标
+            radius: ['0%', '25%'],
+            itemStyle: { //图形样式
+              normal: {
+                color: {
+                  type: 'radial',
+                  x: 0.5,
+                  y: 0.5,
+                  r: 0.5,
+                  colorStops: [{
+                    offset: 0,
+                    color: 'rgba(48,230,142,0.1)' // 0% 处的颜色
+                  }, {
+                    offset: 1,
+                    color: 'rgba(48,230,142,1)' // 100% 处的颜色
+                  }],
+                  globalCoord: false // 缺省为 false
+                },
+                borderWidth: 1.5,
+                opacity: 0.21,
+              }
+            },
+            label: { //标签的位置
+              normal: {
+                show: true,
+                align: 'center',
+                position: 'center', //标签的位置
+                formatter: "{c}",
+                fontSize: 20,
+                textStyle: {
+                  color: 'rgba(48,230,142,1.0)',
+                }
+              }
+            },
+            data: [{
+              value: 23
+            }]
+          }, {
+            type: 'pie',
+            label: { //标签的位置
+              normal: {
+                show: false,
+              }
+            },
+            clockwise: false,
+            radius: ['35%', '40%'],
+            center: ['75%', '50%'],
+            data: [{
+              value: 20,
+              name: '浊度(NTU)',
+              itemStyle: {
+                color: 'rgba(232,30,135,1.0)'
+              }
+            }]
+          }, {
+            name: '',
+            type: 'pie',
+            clockwise: false,
+            silent: true,
+            minAngle: 20, //最小的扇区角度（0 ~ 360）
+            center: ['75%', '50%'], //饼图的中心（圆心）坐标
+            radius: ['0%', '25%'],
+            itemStyle: { //图形样式
+              normal: {
+                color: {
+                  type: 'radial',
+                  x: 0.5,
+                  y: 0.5,
+                  r: 0.5,
+                  colorStops: [{
+                    offset: 0,
+                    color: 'rgba(232,30,135,0.1)' // 0% 处的颜色
+                  }, {
+                    offset: 1,
+                    color: 'rgba(232,30,135,1)' // 100% 处的颜色
+                  }],
+                  globalCoord: false // 缺省为 false
+                },
+                borderWidth: 1.5,
+                opacity: 0.21,
+              }
+            },
+            label: { //标签的位置
+              normal: {
+                show: true,
+                align: 'center',
+                position: 'center', //标签的位置
+                formatter: "{c}",
+                fontSize: 20,
+                textStyle: {
+                  color: 'rgba(232,30,135,1.0)',
+                }
+              }
+            },
+            data: [{
+              value: 20
+            }]
           }]
         };
         brr.setOption(option);
+      },
+      // 波浪
+      statistics() {
+        let brr = echarts.init(this.$refs.Rightlogintwo);
+        let option = {
+          grid: {
+            x: 55,
+            y: 30,
+            x2: 65,
+            y2: 25,
+            borderWidth: 2
+          },
+          yAxis: {
+            name:'化学物',
+            data: ['镉', '汞', '铅', '钾', '铬', '铜', '砷', '锌'],
+            /*splitLine: {
+                lineStyle: {
+                    type: 'dashed'
+                }
+            }*/
+            splitLine: {
+              show: false,
+              lineStyle: {
+                color: '#233e64'
+              }
+            },
+            axisLine: {
+              show: true,
+              lineStyle: {
+                color: '#178eeb'
+              },
+            },
+          },
+          xAxis: {
+            name:'超标率',
+            axisLabel: {
+              formatter: '{value} %'
+            },
+            splitLine: {
+              show: false,
+              lineStyle: {
+                color: '#233e64'
+              }
+            },
+            axisLine: {
+              show: true,
+              lineStyle: {
+                color: '#178eeb'
+              },
+            },
+          },
+          series: [{
+            type: 'scatter',
+            name: '1990',
+            symbol: 'circle', //'circle', 'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'
+            symbolSize: function(data) {
+              return Math.sqrt(data[2]) * 4;
+            },
+            itemStyle: {
+              normal: {
+                color: (params) => {
+                  // build a color map as your need.
+                  let colorList = [
+                    '#DF6A85',
+                    '#716AA9',
+                    '#34BCC3',
+                    '#FC6D44',
+                    '#0B9FCA',
+                    '#7e2dc2',
+                    '#55c2b9',
+                    '#c23837',
+                  ];
+                  return colorList[params.dataIndex]
+                },
+              }
+            },
+            label: {
+              emphasis: {
+                show: true,
+                formatter: function(param) {
+                  return param.data[3];
+                },
+                position: 'top'
+              },
+            },
+            data: [
+              [50, '镉', 10],
+              [60, '汞', 10],
+              [90, '铅', 10],
+              [20, '钾', 10],
+              [40, '铬', 10],
+              [70, '铜', 10],
+              [35, '砷', 10],
+              [28, '锌', 10],
+            ]
+          }]
+        };
+        brr.setOption(option);
+        // brr.shift();
+      },
+      // 水波图
+      Wave() {
+        let brr = echarts.init(this.$refs.Rightloginthree);
+        var data = [
+          [400, 0, '泄露'],
+          [600, 0, '未处理'],
+          [200, 0, '超标'],
+          [1200, 0, '总数']
+        ]
+        let option = {
+          xAxis: {
+            show: false,
+            type: 'value',
+            min: 0,
+            max: 6
+          },
+          yAxis: {
+            show: false,
+            type: 'value',
+            min: 0,
+            max: 4
+          },
+          grid: {
+            bottom: 0,
+            top: 0,
+            left: 0,
+            right: 0
+          },
+          series: [{
+            type: 'custom',
+            name: 'custom',
+            itemStyle: {
+              normal: {
+                color: new echarts.graphic.LinearGradient(0,0,0,1, [
+                  {offset: 0, color: '#63E4FB'},
+                  {offset: 1, color: '#028BBB'}
+                ]),
+                shadowBlur: 20,
+                shadowOffsetX: -15,
+                shadowOffsetY: 15,
+                shadowColor: 'rgba(0,0,0,0.8)'
+              },
+              emphasis: {
+                color: new echarts.graphic.LinearGradient(0.5,0,0.5,1, [
+                  {offset: 0, color: '#63E4FBCC'},
+                  {offset: 1, color: '#028BBBCC'}
+                ])
+              }
+            },
+            renderItem: function(params, api) {
+              var value = api.value(0);
+              var diff = api.value(1);
+              var name = api.value(2);
+              var size = (100 - 30) / (15 - 0) * value/100 + 60;
+              var coord = api.coord([params.dataIndexInside + 1, (params.dataIndexInside) % 2+ 1]);
+              var x = coord[0];
+              var y = coord[1];
+              var d = (size / 2) * Math.cos(45 / 180);
+              var points = {
+                left: [x - d, y],
+                right: [x + d, y],
+                top: [x, y - d],
+                bottom: [x, y + d]
+              }
+              var valueLength = String(value).length;
+              var valueWidth = 12 * valueLength;
+              var unitWidth = 12;
+              var iconWidth = diff ? 5 : 0;
+              var labelWidth = valueWidth + unitWidth + iconWidth;
+              var labelHeight = 18
+              return {
+                type: 'group',
+                children: [
+                  {
+                    type: 'polygon',
+                    shape: {
+                      points: [points.left, points.top, points.right, points.bottom, points.left]
+                    },
+                    style: api.style(),
+                    styleEmphasis: api.styleEmphasis()
+                  },
+                  {
+                    type: 'group',
+                    children: [
+                      {
+                        type: 'text',
+                        style: {
+                          text: value,
+                          x: x - labelWidth / 2,
+                          y: y - labelHeight / 2,
+                          fill: '#fff',
+                          font: 'normal 18px "Microsoft YaHei", sans-serif'
+                        }
+                      },
+                      {
+                        type: 'text',
+                        style: {
+                          text: '个',
+                          x: x - labelWidth / 2 + valueWidth,
+                          y: y - 5,
+                          fill: '#fff',
+                        }
+                      },
+                      {
+                        type: 'text',
+                        style: {
+                          text: diff > 0 ? '↑' : (diff < 0 ? '↓' : ''),
+                          x: x - labelWidth / 2 + valueWidth + unitWidth,
+                          y: y - 5,
+                          fill: '#fff',
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    type: 'text',
+                    style: {
+                      text: name,
+                      x: x - (name.length * 12 / 2),
+                      y: y - d - 18,
+                      fill: '#8492A6',
+                      font: 'normal 12px "Microsoft YaHei", sans-serif'
+                    }
+                  }
+                ]
+              }
+            },
+            data: data,
+            animationDuration: 1500,
+            animationEasing: 'sinusoidalInOut',
+            animationDelay: function(idx) {
+              return idx * 300;
+            }
+          }]
+        };
+        brr.setOption(option);
+      },
+      // 左下
+      signal() {
+        let brr = echarts.init(this.$refs.Leftloginthree);
+        var data = {
+          id: 'echartPie',
+          value: [12, 32, 54, 12,23,43,54,65,12,32],
+          legend: ['商河市', '济阳市', '章丘市', '平阴市', '长清区', '历城区', '历下区', '市中区', '槐荫区', '天桥区'],
+          color: ['#3FA7DC', '#c23837', '#5170A2', '#E1B0AA', '#a9e142', '#E1CA74', '#D89EE1', '#2a6ee1', '#3ce161', '#DCCEBB'],
+          // tooltipShow:false,    //设置悬浮提示显示              --默认显示true
+          // hoverAnimation:false, //设置鼠标悬浮点击饼图动画效果  --默认开启动画true
+        }
+        var seriesData = []
+        data.value.forEach(function(item, index) {
+          seriesData.push({
+            value: item,
+            name: data.legend[index]
+          })
+        })
+        var option = {
+          tooltip: {
+            legend: {
+              orient : 'vertical',
+              x : 10,
+              y : 500,
+            },
+            trigger: 'item',
+            show: data.tooltipShow === false ? false : true
+            //   formatter: "{b}: {c} ({d}%)"
+          },
+          legend: {
+            type: 'scroll',
+            orient: 'vertical',
+            right:0,
+            top: 0,
+            bottom:0,
+            icon: 'circle',
+            selectedMode: false,
+            itemWidth: 6,
+            itemHeight: 6,
+            itemGap: 6,
+            borderRadius: 6,
+            data: data.legend,
+            textStyle: {
+              color: '#708ACC'
+            },
+          },
+          series: [{
+            type: 'pie',
+            // clickable:false,
+            // selectedMode: 'single',//单点击设置
+            hoverAnimation: data.hoverAnimation === false ? false : true,
+            radius: ['59%', '100%'],
+            color: data.color,
+            label: {
+              normal: {
+                position: 'inner',
+                // formatter: '{d}%',
+                formatter: function(param) {
+                  if (!param.percent) return ''
+                  var f = Math.round(param.percent * 10) / 10;
+                  var s = f.toString();
+                  var rs = s.indexOf('.');
+                  if (rs < 0) {
+                    rs = s.length;
+                    s += '.';
+                  }
+                  while (s.length <= rs + 1) {
+                    s += '0';
+                  }
+                  return s + '%';
+                },
+                textStyle: {
+                  color: '#fff',
+                  fontSize: 9
+                }
+              }
+            },
+            labelLine: {
+              normal: {
+                show: false
+              }
+            },
+            data: seriesData
+          }]
+        };
+        brr.setOption(option);
+      },
+
+      // 传感器类型接口
+      option() {
+        this.$http.get('holecoverServer/getResSensorAmount')
+          .then(res => {
+            let _this = this;
+            console.log(res);
+            let rs = res.data.rows;
+            rs.forEach(function (row) {
+              _this.number.push(row.category);
+              _this.numbers.push(row.total);
+            });
+            this.Typeratio();
+          });
+      },
+      videoEnd(){
+        this.$refs.video_d.play();
       }
     },
     mounted() {
-      this.auto();
-      this.hold();
-      this.autos();
-      this.Typeratio();
-      this.Thermodynamic();
+      let _this = this;
+      //传感器类型
+      _this.$message({
+        message: '地图加载成功',
+        type: 'success'
+      });
       this.Analysis();
       this.statistics();
       this.Wave();
+      this.autos();
+      this.signal();
+      this.option();
+      // this.typeAnalysis();
+      setInterval(function () {
+        _this.hold();
+        // _this.atmosphere();   //蜘蛛网
+      }, 3000);
+
     }
   }
-
-
 </script>
 
 <style lang="less" scoped>
+  .echartsContent {
+    position: fixed;
+    top: 42%;
+    left: 511px;
+    z-index: 2;
+  }
+
+  .echartsContent .content {
+    width: 300px;
+    height: 200px;
+  }
   #login {
     position: absolute;
     left: 0;
@@ -1030,7 +1530,6 @@
   .Leftlogin {
     width: 24%;
     height: 100%;
-    margin-top: -13px;
     float: left;
     margin-left: 1%;
     .Leftloginone {
@@ -1039,14 +1538,67 @@
       background-image: url('../icon/leftback.png');
       background-repeat: no-repeat;
       background-size: 100%;
+      position: relative;
       /*background: bisque;*/
+      .Leftloginonetitle {
+        width: 90%;
+        height: 63%;
+        position: absolute;
+        z-index: 10000;
+        top: 17.5%;
+        left: 6%;
+      }
     }
     .Leftlogintwo {
       width: 100%;
-      height: 32%;
+      height: 31%;
+      max-width: 100%;
+      max-height: 32%;
       background-image: url('../icon/leftback.png');
       background-repeat: no-repeat;
       background-size: 100%;
+      position: relative;
+      .Leftlogintwotitle {
+        width: 90%;
+        height: 63%;
+        position: absolute;
+        z-index: 10000;
+        top: 17.5%;
+        left: 6%;
+        img {
+          width: 90%;
+          height: 90%;
+        }
+      }
+      .lefttwo {
+        width: 21%;
+        height: 100px;
+        position: absolute;
+        right: 4%;
+        top: 48%;
+        z-index: 100000;
+        div {
+          padding: 0;
+          margin: 0;
+          width: 100%;
+          height: 33%;
+          color: #708ACC;
+          font-size: 12px;
+          text-align: center;
+          line-height: 33px;
+          span {
+            display: inline-block;
+            width: 13%;
+            height: 36%;
+            background: darkblue;
+            float: left;
+            border-radius: 42%;
+            margin-top: 10%;
+            margin-left: 15%;
+          }
+
+        }
+      }
     }
     .Leftloginthree {
       width: 100%;
@@ -1054,7 +1606,54 @@
       background-image: url('../icon/leftback.png');
       background-repeat: no-repeat;
       background-size: 100%;
+      position: relative;
+
+      .Leftloginthreetitle {
+        width: 90%;
+        height: 63%;
+        position: absolute;
+        z-index: 10000;
+        top: 17.5%;
+        left: 6%;
+      }
+      .Leftthree{
+        position: absolute;
+        right: 5%;
+        top: 17%;
+        width: 25%;
+        height: 15%;
+        p{
+          width: 100%;
+          height: 50%;
+          padding: 0;
+          margin: 0;
+          font-size: 12px;
+          color:#708ACC;
+          span{
+           width:20% ;
+            height: 20%;
+            display: inline-block;
+            border-radius: 20%;
+          }
+        }
+      }
     }
+    .bigdataspan {
+      position: absolute;
+      z-index: 100000;
+      width: 41%;
+      height: 7%;
+      top: 4%;
+      left: 5%;
+      font-size: 14px;
+      color: #65C6E7;
+      text-indent: 5px;
+    }
+  }
+
+  #login img {
+    width: 90%;
+    height: 90%;
   }
 
   #allmap {
@@ -1066,44 +1665,59 @@
     width: 47%;
     height: 100%;
     float: left;
-    opacity: 0.6;
+    /*opacity: 0.6;*/
     margin-left: 1.5%;
+    position: relative;
     .Contentlogintop {
       width: 100%;
       /*margin-left: 5%;*/
       margin-top: 2%;
       height: 52%;
       z-index: 100;
+      opacity: 0.6;
       position: relative;
-      .Transformation {
-        position: absolute;
-        right: 7%;
-        bottom: 14%;
-        width: 42px;
-        height: 42px;
-        cursor: pointer;
-        background-image: url('../icon/Backgbox.png');
+     background:#061D3D;
+      background-image: url('../icon/map.png');
+      background-repeat: no-repeat;
+      background-size: 85% 96%;
+      .sssb{
+        width: 202px;
+        height: 297px;
+        margin-left: 5%;
+        color:#fff;
+        margin-top: 5%;
+        background-image: url('../icon/juxing.png');
         background-repeat: no-repeat;
-        background-size: 100%;
-        img {
-          width: 100%;
-          height: 100%;
+        background-size: 100% 95%;
+        p{
+          margin-left: 5%;
+          text-align: center;
         }
+
       }
-      .Deduction {
+     .ssb p:nth-child(1){
+        margin-top: 5%;
+      }
+      .spanjihe{
         position: absolute;
-        right: 7%;
-        bottom: 4%;
-        width: 42px;
-        height: 42px;
-        cursor: pointer;
-        background-image: url('../icon/Backgbox.png');
-        background-repeat: no-repeat ;
-        background-size: 100%;
-        img {
-          width: 100%;
-          height: 100%;
+        right: 6%;
+        bottom: 8%;
+        p{
+          padding: 0;
+          margin: 0;
+          color:#fff;
+          span{
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            font-size: 9px;
+            cursor: pointer;
+
+          }
         }
+
       }
     }
     .Contentloginbottom {
@@ -1114,13 +1728,94 @@
       background-repeat: no-repeat;
       background-size: 100% 84%;
       margin-top: 29px;
+      position: relative;
+      .Contentloginbottomtitle {
+        width: 54%;
+        height: 60%;
+        z-index: 10000;
+        margin-right: 3%;
+        float: right;
+        margin-top: 5%;
+      }
+      .loginbottom {
+        width: 30%;
+        height: 53px;
+        position: absolute;
+        top: 9%;
+        left: 35%;
+        p {
+          width: 100%;
+          height: 50%;
+          padding: 0;
+          margin: 0;
+          text-align: center;
+          line-height: 25px;
+        }
+      }
+      .loginbottoms {
+        width: 40%;
+        height: 60%;
+        float: left;
+        margin-top: 7%;
+        margin-left: 3%;
+        div{
+          width: 100%;
+          height: 37%;
+          margin-top: 4%;
+          text-align: center;
+          line-height: 82px;
+          div{
+            width: 50%;
+            height: 100%;
+            float: left;
+            font-size: 16px;
+            color:#65C6E7;
+            span{
+              width: 40%;
+              height: 100%;
+              display: inline-block;
+              background-image: url('../icon/shuizhi.png');
+              background-repeat: no-repeat;
+              background-size: 100% 100%;
+              font-size: 26px;
+              color:#65C6E7;
+              font-weight: 700;
+              text-indent: 0px;
+            }
+          }
+        }
+      }
     }
-  }
+    .Contentvideo{
+      width: 350px;
+      height: 223px;
+      position: absolute;
+      top: 8%;
+      right: 0%;
+      z-index: 30000;
+      background-image: url('../icon/pic_rideo.png');
+      background-repeat: no-repeat;
+      background-size: 100% 102%;
+      .videospan{
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        right: 2%;
+        top: 3px;
+        cursor: pointer;
+      }
+      #vid{
+        width: 304px;
+        height: 265px;
+        margin-top: -4.5%;
+        margin-left: 5%;
+      }
+      }
+    }
 
   .Rightlogin {
     width: 24%;
     height: 100%;
-    margin-top: -13px;
     margin-right: 1%;
     float: right;
     .Rightloginone {
@@ -1129,13 +1824,31 @@
       background-image: url('../icon/rightback.png');
       background-repeat: no-repeat;
       background-size: 100%;
+      position: relative;
+      .Rightloginonetitle {
+        width: 90%;
+        height: 63%;
+        position: absolute;
+        z-index: 10000;
+        top: 17.5%;
+        right: 6%;
+      }
     }
     .Rightlogintwo {
       width: 100%;
-      height: 32%;
+      height: 31%;
       background-image: url('../icon/rightback.png');
       background-repeat: no-repeat;
       background-size: 100%;
+      position: relative;
+      .Rightlogintwotitle {
+        width: 90%;
+        height: 63%;
+        position: absolute;
+        z-index: 10000;
+        top: 17.5%;
+        right: 6%;
+      }
     }
     .Rightloginthree {
       width: 100%;
@@ -1143,7 +1856,49 @@
       background-image: url('../icon/rightback.png');
       background-repeat: no-repeat;
       background-size: 100%;
+      position: relative;
+      .Rightloginthreetitle {
+        width: 90%;
+        height: 63%;
+        position: absolute;
+        z-index: 10000;
+        top: 17.5%;
+        right: 6%;
+      }
+      .rightspan {
+        position: absolute;
+        width: 89%;
+        height: 31px;
+        top: 20%;
+        left: 5%;
+        z-index: 1000;
+        div {
+          width: 28%;
+          height: 100%;
+          float: left;
+          margin-left: 4%;
+          background-image: url('../icon/pic_yali.png');
+          background-repeat: no-repeat;
+          background-size: 100%;
+          font-size: 12px;
+          color: #01FDE8;
+          text-align: center;
+          line-height: 31px;
+        }
+      }
     }
+    .bigdataspans {
+      position: absolute;
+      z-index: 100000;
+      width: 44%;
+      height: 7%;
+      top: 4%;
+      right: 3%;
+      font-size: 14px;
+      color: #65C6E7;
+      text-indent: 5px;
+    }
+
   }
 
   /*  @media (min-width: 1360px){

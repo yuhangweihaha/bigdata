@@ -10,16 +10,20 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/':{
-        target:"http://http://172.30.17.162:9090",
-        changeOrigin:true,
-        // secure:false,
+      /*'/':{
+        target:"http://172.30.17.162:8123",
         pathRewrite: function(url){
           return url;
         }
+      },*/
+    '/holecoverServer':{
+      target: 'http://172.30.17.162:8081',
+      // target: 'http://172.30.17.164:8081',
+      pathRewrite: {
+        '^/holecoverServer': '/holecoverServer/'
       }
+    }
     },
-
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
     port: 9090, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
